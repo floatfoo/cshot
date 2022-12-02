@@ -4,7 +4,7 @@
 Cshot is yet another suckless program for your x11 linux desktop.
 
 Basic utils including:
-	- cli
-		- save file
-		- save to copy buffer
-	- dwm integration
+	+ cli
+		+ save file
+		+ save to copy buffer
+	+ dwm integration
