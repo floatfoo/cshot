@@ -1,2 +1,6 @@
 ### EMACS ###
 .projectile
+
+### Build files
+obj/
+cshot
