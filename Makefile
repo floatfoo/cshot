@@ -14,7 +14,8 @@ $(TARGET): $(OBJ)
 	$(CC) $(FLAGS) $(LINK) $(OBJ) -o $(TARGET)
 
 $(OBJ): $(SRC)
-	$(CC) -c $(FLAGS) $(LINK) $(SRC) -o $(OBJ_PATH)main.o
+	$(CC) -c $(FLAGS) $(LINK) $< -o $@
 
 clean:
-	rm $(TARGET) $(OBJ_PATH)*.o
+	rm  $(OBJ_PATH)*.o
+	rm $(TARGET)
