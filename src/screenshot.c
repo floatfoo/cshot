@@ -32,10 +32,10 @@ take_screenshot(char *path)
 
   /* Start creating png image */
   int init_path_len = strlen(path);
-  if (path[init_path_len - 1] != '/' && strcmp(path + init_path_len - 4, ".png") != 0)
-    strcat(path, "/");
+  if (strlen(path) != 1 &&
+      path[init_path_len - 1] != '/' &&
+      strcmp(path + init_path_len - 4, ".png") != 0) strcat(path, "/");
 
-  printf("%s", path);
 
   /* Path validation */
   if (strcmp(path, ".") == 0)
@@ -43,6 +43,7 @@ take_screenshot(char *path)
   else
     strcat(path, "screenshot.png");
 
+  printf("%s", path);
 
   /* file creation */
   FILE *fp = fopen(path, "wb");
