@@ -7,14 +7,14 @@ OBJ_PATH = obj/
 SRC = $(wildcard $(SRC_PATH)*.c)
 OBJ = $(patsubst $(SRC_PATH)%.c, $(OBJ_PATH)%.o, $(SRC))
 
-CFLAGS = -Wall -g -O1
-LDFLAGS = -lX11
+CFLAGS = -Wall -g -O3
+LDFLAGS = -lX11 -lpng
 
 $(TARGET): $(OBJ)
-	$(LINK.c) $< -o $@
+	$(LINK.c) $^ -o $@
 
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	$(COMPILE.c) -o $@ $<
 
 clean:
-	$(RM) $(OBJ_PATH)*.o $(TARGET)
+	$(RM) $(OBJ_PATH)*.o $(TARGET) *.png

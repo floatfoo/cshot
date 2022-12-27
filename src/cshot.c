@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <argp.h>
+#include "screenshot.h"
+
 #define ARGPC 1
 
 const char *argp_program_version = "1.0";
@@ -8,7 +10,7 @@ static char doc[] =
   "cshot - simple x11 screenshot facility";
 
 static struct argp_option options[] = {
-  {"save", 's', "path", 0, "Save screenshot to provided directory"},
+  {"path", 'p', "path", 0, "Save screenshot to provided path"},
 };
 
 struct arguments
@@ -24,7 +26,7 @@ parse_opt(int key, char *arg, struct argp_state *state)
 
   switch (key)
   {
-  case 's':
+  case 'p':
     arguments->output_path = arg;
     break;
   default:
@@ -40,9 +42,9 @@ int
 main(int argc, char **argv)
 {
   struct arguments arguments;
-  arguments.output_path = "-";
+  arguments.output_path = ".";
 
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
-  printf("%s\n", arguments.output_path);
-  return 0;
+
+  return take_screenshot(arguments.output_path) == 0 ? 0 : 1;
 };
