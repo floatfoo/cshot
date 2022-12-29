@@ -1,5 +1,6 @@
 - [ ] Refactor
 - [ ] Shared memory implementation
 - [ ] make install
+- [ ] Extensive README
 - [ ] dwm integration
 - [ ] command line setting
