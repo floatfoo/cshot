@@ -155,12 +155,21 @@ take_screenshot(char *path)
   for(int y = 0; y < screenshot.height; y++)
   {
     png_free(pngp, row_pointers[y]);
+    row_pointers[y] = NULL;
   }
   png_free(pngp, row_pointers);
+  row_pointers = NULL;
+
+  free(screenshot.pixels);
+  screenshot.pixels = NULL;
 
   png_destroy_write_struct(&pngp, &png_infop);
+  pngp = NULL, png_infop = NULL;
   fclose(fp);
+  fp = NULL;
 
+  image->f.destroy_image(image);
+  image = NULL;
   XCloseDisplay(display);
   return 0;
 };
