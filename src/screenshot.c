@@ -1,5 +1,7 @@
 #include "screenshot.h"
+#include <X11/X.h>
 #include <X11/Xlib.h>
+#include <stdio.h>
 
 typedef struct pixel_t
 {
@@ -9,6 +11,7 @@ typedef struct pixel_t
 }
   pixel_t;
 
+
 typedef struct bitmap_t
 {
   pixel_t *pixels;
@@ -16,12 +19,14 @@ typedef struct bitmap_t
 }    
   bitmap_t;
 
+
 /* Get pixel from gixen bitmap at (x, y) */
 static pixel_t *
 pixel_at(bitmap_t *bitmap, int x, int y)
 {
   return bitmap->pixels + bitmap->width * y + x;
 };
+
 
 /* X11 error handling */
 int
@@ -34,16 +39,30 @@ XHandleError(Display *display, XErrorEvent *e)
   return 0;
 };
 
+
 int
 take_screenshot(char *path)    
 {
   /* Get display and root window */
   Display *display = XOpenDisplay(NULL);
+
+  /* set error handler */
+  XSetErrorHandler(XHandleError);
+
+  /* XOpenDisplay may set errno to 11
+   * even though display is not NULL
+   */
+  if (!display)
+  {
+    fprintf(stderr, "Error opening display: %s", strerror(errno));
+    return 1;
+  }
+
   Window root = DefaultRootWindow(display);
 
   /* Get windows attrs */
   XWindowAttributes gwa;
-  XGetWindowAttributes(display, root, &gwa);
+  Status s = XGetWindowAttributes(display, root, &gwa);
 
   /* Getting image of root window */
   XImage *image = XGetImage(display,
@@ -56,6 +75,7 @@ take_screenshot(char *path)
   /* If there is error during getting an image */
   if (image == NULL)
   {
+    fprintf(stderr, "Error getting screen image");
     XCloseDisplay(display);
     display = NULL;
     return 1;
@@ -80,7 +100,7 @@ take_screenshot(char *path)
     }
   }
 
-    /* Start creating png image */
+  /* Start creating png image */
   FILE *fp = NULL;
   png_structp pngp = NULL;
   png_infop png_infop = NULL;
@@ -101,10 +121,47 @@ take_screenshot(char *path)
       path[init_path_len - 1] != '/' &&
       strcmp(path + init_path_len - 4, ".png") != 0) strcat(path, "/");
 
-  if (strcmp(path, ".") == 0)
-    path = "screenshot.png";
+  /* add timestamp */
+  time_t current_time = time(NULL);
+  if (current_time == -1)
+  {
+      
+  }
+
+  char timestamp[64];
+  strftime(timestamp,
+	   sizeof(timestamp),
+	   "%Y-%m-%d %H:%M:%S",
+	   localtime(&current_time));
+
+  /* if didn't get time */
+  if (errno != 0)
+  {
+    fprintf(stderr, "Error getting the timestamp: %s", strerror(errno));
+    XCloseDisplay(display);
+    display = NULL;
+    free(screenshot.pixels);
+    screenshot.pixels = NULL;
+    return 1;
+  }
+
+  
+  if (strcmp(path + init_path_len - 4, ".png") != 0 && strcmp(path, ".") == 0)
+  {
+    path = "screenshot-";
+    strcat(timestamp, ".png");
+    strcat(path, timestamp);
+  }
   else
-    strcat(path, "screenshot.png");
+  {
+    if (strcmp(path + init_path_len - 4, ".png") != 0)
+    {
+      char *postfix = "screenshot-";
+      strcat(timestamp, ".png");
+      strcat(postfix, timestamp);
+      strcat(path, postfix);
+    }
+  }
 
   /* file creation */
   fp = fopen(path, "wb");

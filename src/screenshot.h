@@ -7,6 +7,8 @@
 #include <string.h>
 #include <png.h>
 #include <stdint.h>
+#include <time.h>
+#include <errno.h>
 
 #define SCREENSHOT_H
 
