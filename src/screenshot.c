@@ -1,4 +1,5 @@
 #include "screenshot.h"
+#include <X11/Xlib.h>
 
 typedef struct pixel_t
 {
@@ -15,12 +16,14 @@ typedef struct bitmap_t
 }    
   bitmap_t;
 
+/* Get pixel from gixen bitmap at (x, y) */
 static pixel_t *
 pixel_at(bitmap_t *bitmap, int x, int y)
 {
   return bitmap->pixels + bitmap->width * y + x;
 };
 
+/* X11 error handling */
 int
 XHandleError(Display *display, XErrorEvent *e)    
 {
@@ -34,13 +37,15 @@ XHandleError(Display *display, XErrorEvent *e)
 int
 take_screenshot(char *path)    
 {
+  /* Get display and root window */
   Display *display = XOpenDisplay(NULL);
   Window root = DefaultRootWindow(display);
 
+  /* Get windows attrs */
   XWindowAttributes gwa;
-
   XGetWindowAttributes(display, root, &gwa);
 
+  /* Getting image of root window */
   XImage *image = XGetImage(display,
 			    root,
 			    0, 0,
@@ -48,6 +53,15 @@ take_screenshot(char *path)
 			    AllPlanes,
 			    ZPixmap);
 
+  /* If there is error during getting an image */
+  if (image == NULL)
+  {
+    XCloseDisplay(display);
+    display = NULL;
+    return 1;
+  }
+
+  /* Creating bitmap for screenshot */
   bitmap_t screenshot;
   screenshot.height = gwa.height;
   screenshot.width = gwa.width;
@@ -62,14 +76,11 @@ take_screenshot(char *path)
       uint32_t pixel = image->f.get_pixel(image, y, x);
       pixel_at(&screenshot, y, x)->blue = pixel & image->blue_mask;
       pixel_at(&screenshot, y, x)->green = (pixel & image->green_mask) >> 8;
-      pixel_at(&screenshot, y, x)->red = (pixel & image->red_mask) >> 16;
+      pixel_at(&screenshot, y, x)->red = pixel & (image->red_mask) >> 16;
     }
   }
 
-  if (image == NULL)
-    return 1;
-
-  /* Start creating png image */
+    /* Start creating png image */
   FILE *fp = NULL;
   png_structp pngp = NULL;
   png_infop png_infop = NULL;
@@ -79,13 +90,17 @@ take_screenshot(char *path)
   /* aka sample in spec */
   int depth = 8;
 
+  /*
+   * Path validation
+   * if given path with out a backslash,
+   * append it (ignoring .png file itself)
+   *
+   */
   int init_path_len = strlen(path);
   if (strlen(path) != 1 &&
       path[init_path_len - 1] != '/' &&
       strcmp(path + init_path_len - 4, ".png") != 0) strcat(path, "/");
 
-
-  /* Path validation */
   if (strcmp(path, ".") == 0)
     path = "screenshot.png";
   else
