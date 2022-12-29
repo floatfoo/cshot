@@ -1,6 +1,4 @@
 #include "screenshot.h"
-#include <png.h>
-#include <stdint.h>
 
 typedef struct pixel_t
 {
