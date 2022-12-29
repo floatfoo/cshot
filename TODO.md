@@ -1,4 +1,5 @@
-* Shared memory implementation
-* make install
-* dwm integration
-* command line setting
+- [ ] Refactor
+- [ ] Shared memory implementation
+- [ ] make install
+- [ ] dwm integration
+- [ ] command line setting
