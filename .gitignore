@@ -7,3 +7,7 @@ cshot
 
 # ignore images
 *.png
+
+# profiling and debugging
+analysis.txt
+gmon.out
