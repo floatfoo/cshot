@@ -1,4 +1,8 @@
 - [ ] Refactor
+- [ ] Format code
+- [ ] Newer C standart
+- [ ] Optimize
+- [ ] Write Unit tests
 - [ ] make install
 - [ ] UI
 - [ ] Shared memory implementation
