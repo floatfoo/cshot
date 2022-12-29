@@ -4,3 +4,6 @@
 ### Build files
 obj/
 cshot
+
+# ignore images
+*.png
