@@ -123,10 +123,6 @@ take_screenshot(char *path)
 
   /* add timestamp */
   time_t current_time = time(NULL);
-  if (current_time == -1)
-  {
-      
-  }
 
   char timestamp[64];
   strftime(timestamp,
@@ -166,7 +162,12 @@ take_screenshot(char *path)
   /* file creation */
   fp = fopen(path, "wb");
 
-  if (!fp) {
+  if (!fp)
+  {
+    XCloseDisplay(display);
+    display = NULL;
+    free(screenshot.pixels);
+    screenshot.pixels = NULL;
     return 1; 
   }
 
@@ -175,7 +176,14 @@ take_screenshot(char *path)
   if (!pngp)
   {
     png_destroy_write_struct(&pngp, &png_infop);
+    pngp = NULL;
+    png_infop = NULL;
     fclose(fp);
+    fp = NULL;
+    XCloseDisplay(display);
+    display = NULL;
+    free(screenshot.pixels);
+    screenshot.pixels = NULL;
     return 1;
   }
 
@@ -183,7 +191,14 @@ take_screenshot(char *path)
   if (!png_infop)
   {
     png_destroy_write_struct(&pngp, &png_infop);
+    pngp = NULL;
+    png_infop = NULL;
     fclose(fp);
+    fp = NULL;
+    XCloseDisplay(display);
+    display = NULL;
+    free(screenshot.pixels);
+    screenshot.pixels = NULL;
     return 1;
   }
 
@@ -192,10 +207,18 @@ take_screenshot(char *path)
   if (setjmp(png_jmpbuf(pngp)))
   {
     png_destroy_write_struct(&pngp, &png_infop);
+    pngp = NULL;
+    png_infop = NULL;
     fclose(fp);
+    fp = NULL;
+    XCloseDisplay(display);
+    display = NULL;
+    free(screenshot.pixels);
+    screenshot.pixels = NULL;
     return 1;
   }
 
+  /* set IHDR png header */
   png_set_IHDR(pngp,
 	       png_infop,
 	       screenshot.width, screenshot.height,
@@ -205,12 +228,16 @@ take_screenshot(char *path)
 	       PNG_COMPRESSION_TYPE_DEFAULT,
 	       PNG_FILTER_TYPE_DEFAULT);
 
-  row_pointers = png_malloc(pngp, gwa.height * sizeof(png_byte*));
+  /* pointers to row
+   * each row contain bytes
+   * describing pixel
+   */
+  row_pointers = png_malloc(pngp, screenshot.height * sizeof(png_byte*));
   for (int y = 0; y < gwa.height; ++y)
   {
-    png_bytep row = png_malloc(pngp, sizeof(uint8_t) * gwa.width * pixel_size);
+    png_bytep row = png_malloc(pngp, sizeof(uint8_t) * screenshot.width * pixel_size);
     row_pointers[y] = row;
-    for (int x = 0; x < gwa.width; ++x)
+    for (int x = 0; x < screenshot.width; ++x)
     {
       pixel_t *pixel = pixel_at(&screenshot, x, y);
       *row++ = pixel->red;
