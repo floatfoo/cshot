@@ -2,6 +2,7 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 typedef struct pixel_t
 {
@@ -43,6 +44,8 @@ XHandleError(Display *display, XErrorEvent *e)
 int
 take_screenshot(char *path)    
 {
+  int status = 0;
+
   /* Get display and root window */
   Display *display = XOpenDisplay(NULL);
 
@@ -54,8 +57,8 @@ take_screenshot(char *path)
    */
   if (!display)
   {
-    fprintf(stderr, "Error opening display: %s", strerror(errno));
-    return 1;
+    perror("Error opening display");
+    return ERRDISPLAY;
   }
 
   Window root = DefaultRootWindow(display);
@@ -75,10 +78,9 @@ take_screenshot(char *path)
   /* If there is error during getting an image */
   if (image == NULL)
   {
-    fprintf(stderr, "Error getting screen image");
-    XCloseDisplay(display);
-    display = NULL;
-    return 1;
+    perror("Error getting screen image");
+    status = ERRIMG;
+    goto display;
   }
 
   /* Creating bitmap for screenshot */
@@ -121,101 +123,83 @@ take_screenshot(char *path)
       path[init_path_len - 1] != '/' &&
       strcmp(path + init_path_len - 4, ".png") != 0) strcat(path, "/");
 
-  /* add timestamp */
-  time_t current_time = time(NULL);
-
-  char timestamp[64];
-  strftime(timestamp,
-	   sizeof(timestamp),
-	   "%Y-%m-%d %H:%M:%S",
-	   localtime(&current_time));
-
-  /* if didn't get time */
-  if (errno != 0)
+  /* check if file already exist */
+  if (strcmp(path, ".") != 0)
   {
-    fprintf(stderr, "Error getting the timestamp: %s", strerror(errno));
-    XCloseDisplay(display);
-    display = NULL;
-    free(screenshot.pixels);
-    screenshot.pixels = NULL;
-    return 1;
-  }
-
-  
-  if (strcmp(path + init_path_len - 4, ".png") != 0 && strcmp(path, ".") == 0)
-  {
-    path = "screenshot-";
-    strcat(timestamp, ".png");
-    strcat(path, timestamp);
-  }
-  else
-  {
-    if (strcmp(path + init_path_len - 4, ".png") != 0)
+    if (access(path, F_OK) == 0)
     {
-      char *postfix = "screenshot-";
-      strcat(timestamp, ".png");
-      strcat(postfix, timestamp);
-      strcat(path, postfix);
+      fprintf(stderr, "File already exists!");
+      status = ERRFILECREATION;
+      goto bitmap;
     }
   }
+  
+  if (strcmp(path + init_path_len - 4, ".png") != 0)
+  {
+    /* add timestamp */
+    time_t current_time = time(NULL);
+
+    char timestamp[64];
+    if (strftime(timestamp,
+	     sizeof(timestamp),
+	     "%Y-%m-%d %H:%M:%S",
+	     localtime(&current_time)) == 0)
+    {
+      perror("Error getting the timestamp");
+      status = ERRTIMESTAPS;
+      goto bitmap;
+    }
+
+    if (strcmp(path, ".") == 0)
+      {
+	path = "screenshot-";
+	strcat(timestamp, ".png");
+	strcat(path, timestamp);
+      }
+    else
+      {
+	char *postfix = "screenshot-";
+	strcat(timestamp, ".png");
+	strcat(postfix, timestamp);
+	strcat(path, postfix);
+      }
+  }
+
 
   /* file creation */
   fp = fopen(path, "wb");
 
   if (!fp)
   {
-    XCloseDisplay(display);
-    display = NULL;
-    free(screenshot.pixels);
-    screenshot.pixels = NULL;
-    return 1; 
+    perror("Error creating the file");
+    status = ERRFILECREATION; 
+    goto bitmap;
   }
 
   /* write png creation */
   pngp = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (!pngp)
   {
-    png_destroy_write_struct(&pngp, &png_infop);
-    pngp = NULL;
-    png_infop = NULL;
-    fclose(fp);
-    fp = NULL;
-    XCloseDisplay(display);
-    display = NULL;
-    free(screenshot.pixels);
-    screenshot.pixels = NULL;
-    return 1;
+    perror("Error creating png struct");
+    status = ERRPNG;
+    goto file;
   }
 
   png_infop = png_create_info_struct(pngp);
   if (!png_infop)
   {
-    png_destroy_write_struct(&pngp, &png_infop);
-    pngp = NULL;
-    png_infop = NULL;
-    fclose(fp);
-    fp = NULL;
-    XCloseDisplay(display);
-    display = NULL;
-    free(screenshot.pixels);
-    screenshot.pixels = NULL;
-    return 1;
+    perror("Error creating png info struct");
+    status = ERRPNGINFO;
+    goto png;
   }
 
   /* something went wrong with png struct creation */
   /* aka setup error handling */
   if (setjmp(png_jmpbuf(pngp)))
   {
-    png_destroy_write_struct(&pngp, &png_infop);
-    pngp = NULL;
-    png_infop = NULL;
-    fclose(fp);
-    fp = NULL;
-    XCloseDisplay(display);
-    display = NULL;
-    free(screenshot.pixels);
-    screenshot.pixels = NULL;
-    return 1;
+    perror("Error creating png struct");
+    status = ERRPNG;
+    goto png;
   }
 
   /* set IHDR png header */
@@ -259,16 +243,24 @@ take_screenshot(char *path)
   png_free(pngp, row_pointers);
   row_pointers = NULL;
 
-  free(screenshot.pixels);
-  screenshot.pixels = NULL;
-
-  png_destroy_write_struct(&pngp, &png_infop);
-  pngp = NULL, png_infop = NULL;
-  fclose(fp);
-  fp = NULL;
 
   image->f.destroy_image(image);
   image = NULL;
+
+ png:
+  png_destroy_write_struct(&pngp, &png_infop);
+  pngp = NULL, png_infop = NULL;
+
+ file:
+  fclose(fp);
+  fp = NULL;
+
+ bitmap:
+  free(screenshot.pixels);
+  screenshot.pixels = NULL;
+
+ display:
   XCloseDisplay(display);
-  return 0;
+  display = NULL;
+  return status;
 };
