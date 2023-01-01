@@ -65,7 +65,7 @@ take_screenshot(char *path)
 
   /* Get windows attrs */
   XWindowAttributes gwa;
-  Status s = XGetWindowAttributes(display, root, &gwa);
+  XGetWindowAttributes(display, root, &gwa);
 
   /* Getting image of root window */
   XImage *image = XGetImage(display,
@@ -133,7 +133,8 @@ take_screenshot(char *path)
       goto bitmap;
     }
   }
-  
+
+  char path_to_image[512];
   if (strcmp(path + init_path_len - 4, ".png") != 0)
   {
     /* add timestamp */
@@ -152,22 +153,22 @@ take_screenshot(char *path)
 
     if (strcmp(path, ".") == 0)
       {
-	path = "screenshot-";
+	strcat(path_to_image, "screenshot-");
 	strcat(timestamp, ".png");
-	strcat(path, timestamp);
+	strcat(path_to_image, timestamp);
       }
     else
       {
 	char *postfix = "screenshot-";
 	strcat(timestamp, ".png");
 	strcat(postfix, timestamp);
-	strcat(path, postfix);
+	strcat(path_to_image, postfix);
       }
   }
 
 
   /* file creation */
-  fp = fopen(path, "wb");
+  fp = fopen(path_to_image, "wb");
 
   if (!fp)
   {
