@@ -96,9 +96,9 @@ take_screenshot(char *path)
     for (int x = 0; x < screenshot.height; ++x)
     {
       uint32_t pixel = image->f.get_pixel(image, y, x);
-      pixel_at(&screenshot, y, x)->blue = pixel & image->blue_mask;
       pixel_at(&screenshot, y, x)->green = (pixel & image->green_mask) >> 8;
-      pixel_at(&screenshot, y, x)->red = pixel & (image->red_mask) >> 16;
+      pixel_at(&screenshot, y, x)->red = (pixel & image->red_mask) >> 16;
+      pixel_at(&screenshot, y, x)->blue = pixel & image->blue_mask;
     }
   }
 
