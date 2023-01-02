@@ -3,9 +3,11 @@
 - [ ] Newer C standart
 - [ ] Optimize
 - [ ] Write Unit tests
-- [ ] make install
+- [X] make install
+- [ ] release
 - [ ] UI
 - [ ] Shared memory implementation
+- [ ] wayland impl
 - [ ] Extensive README
 - [ ] dwm integration
 - [ ] command line setting
