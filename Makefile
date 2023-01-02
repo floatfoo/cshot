@@ -16,5 +16,12 @@ $(TARGET): $(OBJ)
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	$(COMPILE.c) -o $@ $<
 
+install:
+	chmod +x $(TARGET)
+	cp $(TARGET) /usr/local/bin/
+
+uninstall:
+	$(RM) /usr/local/bin/$(TARGET)
+
 clean:
 	$(RM) $(OBJ_PATH)*.o $(TARGET) *.png

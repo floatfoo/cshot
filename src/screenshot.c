@@ -42,7 +42,7 @@ XHandleError(Display *display, XErrorEvent *e)
 
 
 int
-take_screenshot(char *path)    
+take_screenshot(char *path)
 {
   int status = 0;
 
