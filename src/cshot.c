@@ -46,5 +46,5 @@ main(int argc, char **argv)
 
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
-  return take_screenshot(arguments.output_path) == 0 ? 0 : 1;
+  return take_screenshot(arguments.output_path, x_get_bitmap) == 0 ? 0 : 1;
 };

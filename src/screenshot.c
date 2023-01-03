@@ -115,11 +115,11 @@ x_get_bitmap(int* status)
 
 
 int
-take_screenshot(char *path)
+take_screenshot(char *path, const bitmap_t* (get_bitmap)(int*))
 {
   int status = 0;
 
-  const bitmap_t *screenshot = x_get_bitmap(&status);
+  const bitmap_t *screenshot = get_bitmap(&status);
   if (!screenshot)
   {
     if (status == ERRDISPLAY)
