@@ -23,7 +23,7 @@ typedef struct bitmap_t
 
 /* Get pixel from gixen bitmap at (x, y) */
 static pixel_t *
-pixel_at(const bitmap_t *const bitmap, int x, int y)
+pixel_at(bitmap_t *bitmap, int x, int y)
 {
   return bitmap->pixels + bitmap->width * y + x;
 };
@@ -42,7 +42,7 @@ XHandleError(Display *display, XErrorEvent *e)
 
 
 /* get bitmap from x11 api */
-const bitmap_t *
+bitmap_t *
 x_get_bitmap(int* status)
 {
   bitmap_t *screenshot = (bitmap_t*)malloc(sizeof(bitmap_t));
@@ -118,7 +118,7 @@ x_get_bitmap(int* status)
 /* validate and create unix path
  * for image file
  */
-const char *
+char *
 create_unix_path(char *path, int* status)
 {
   /*
@@ -177,11 +177,11 @@ create_unix_path(char *path, int* status)
 
 
 int
-take_screenshot(char *path, const bitmap_t* (get_bitmap)(int*))
+take_screenshot(char *path, bitmap_t* (get_bitmap)(int*))
 {
   int status = 0;
 
-  const bitmap_t *screenshot = get_bitmap(&status);
+  bitmap_t *screenshot = get_bitmap(&status);
   if (!screenshot)
   {
     if (status == ERRDISPLAY)
@@ -202,7 +202,7 @@ take_screenshot(char *path, const bitmap_t* (get_bitmap)(int*))
   /* aka sample in spec */
   int depth = 8;
 
-  const char * path_to_image = create_unix_path(path, &status);
+  char * path_to_image = create_unix_path(path, &status);
   if (!path_to_image)
   {
     if (status == ERRFILECREATION)
