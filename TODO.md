@@ -1,4 +1,4 @@
-- [ ] Refactor
+- [X] Refactor
 - [ ] Format code
 - [ ] Newer C standart
 - [ ] Optimize
