@@ -41,6 +41,7 @@ XHandleError(Display *display, XErrorEvent *e)
 };
 
 
+/* get bitmap from x11 api */
 const bitmap_t *
 x_get_bitmap(int* status)
 {
