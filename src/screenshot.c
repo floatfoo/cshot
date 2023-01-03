@@ -23,7 +23,7 @@ typedef struct bitmap_t
 
 /* Get pixel from gixen bitmap at (x, y) */
 static pixel_t *
-pixel_at(bitmap_t *bitmap, int x, int y)
+pixel_at(const bitmap_t *const bitmap, int x, int y)
 {
   return bitmap->pixels + bitmap->width * y + x;
 };
@@ -41,10 +41,10 @@ XHandleError(Display *display, XErrorEvent *e)
 };
 
 
-int
-take_screenshot(char *path)
+bitmap_t const *const
+x_get_bitmap(int* status)
 {
-  int status = 0;
+  bitmap_t *screenshot = (bitmap_t*)malloc(2*sizeof(bitmap_t));
 
   /* Get display and root window */
   Display *display = XOpenDisplay(NULL);
@@ -57,8 +57,9 @@ take_screenshot(char *path)
    */
   if (!display)
   {
-    perror("Error opening display");
-    return ERRDISPLAY;
+    status = (int*)ERRDISPLAY;
+    screenshot = NULL;
+    goto display;
   }
 
   Window root = DefaultRootWindow(display);
@@ -78,28 +79,55 @@ take_screenshot(char *path)
   /* If there is error during getting an image */
   if (image == NULL)
   {
-    perror("Error getting screen image");
-    status = ERRIMG;
+    status = (int*)ERRIMG;
+    screenshot = NULL;
     goto display;
   }
 
   /* Creating bitmap for screenshot */
-  bitmap_t screenshot;
-  screenshot.height = gwa.height;
-  screenshot.width = gwa.width;
+  screenshot->height = gwa.height;
+  screenshot->width = gwa.width;
   /* bitmap allocating */
-  screenshot.pixels = calloc(screenshot.width * screenshot.height, sizeof(pixel_t));
+  screenshot->pixels = calloc(screenshot->width * screenshot->height,
+			      sizeof(pixel_t));
 
   /* fill the bitmap image */
-  for (int y = 0; y < screenshot.width; ++y)
+  for (int y = 0; y < screenshot->width; ++y)
   {
-    for (int x = 0; x < screenshot.height; ++x)
+    for (int x = 0; x < screenshot->height; ++x)
     {
       uint32_t pixel = image->f.get_pixel(image, y, x);
-      pixel_at(&screenshot, y, x)->green = (pixel & image->green_mask) >> 8;
-      pixel_at(&screenshot, y, x)->red = (pixel & image->red_mask) >> 16;
-      pixel_at(&screenshot, y, x)->blue = pixel & image->blue_mask;
+      pixel_at(screenshot, y, x)->green = (pixel & image->green_mask) >> 8;
+      pixel_at(screenshot, y, x)->red = (pixel & image->red_mask) >> 16;
+      pixel_at(screenshot, y, x)->blue = pixel & image->blue_mask;
     }
+  }
+
+
+  image->f.destroy_image(image);
+  image = NULL;
+
+ display:
+  XCloseDisplay(display);
+  display = NULL;
+  return screenshot;
+};
+
+
+int
+take_screenshot(char *path)
+{
+  int status = 0;
+
+  bitmap_t const *screenshot = x_get_bitmap(&status);
+  if (!screenshot)
+  {
+    if (status == ERRDISPLAY)
+      perror("Error opening display");
+    else if (status == ERRIMG)
+      perror("Error getting screen image");
+
+    goto bitmap;
   }
 
   /* Start creating png image */
@@ -206,7 +234,7 @@ take_screenshot(char *path)
   /* set IHDR png header */
   png_set_IHDR(pngp,
 	       png_infop,
-	       screenshot.width, screenshot.height,
+	       screenshot->width, screenshot->height,
 	       depth,
 	       PNG_COLOR_TYPE_RGB,
 	       PNG_INTERLACE_NONE,
@@ -217,14 +245,14 @@ take_screenshot(char *path)
    * each row contain bytes
    * describing pixel
    */
-  row_pointers = png_malloc(pngp, screenshot.height * sizeof(png_byte*));
-  for (int y = 0; y < gwa.height; ++y)
+  row_pointers = png_malloc(pngp, screenshot->height * sizeof(png_byte*));
+  for (int y = 0; y < screenshot->height; ++y)
   {
-    png_bytep row = png_malloc(pngp, sizeof(uint8_t) * screenshot.width * pixel_size);
+    png_bytep row = png_malloc(pngp, sizeof(uint8_t) * screenshot->width * pixel_size);
     row_pointers[y] = row;
-    for (int x = 0; x < screenshot.width; ++x)
+    for (int x = 0; x < screenshot->width; ++x)
     {
-      pixel_t *pixel = pixel_at(&screenshot, x, y);
+      pixel_t *pixel = pixel_at(screenshot, x, y);
       *row++ = pixel->red;
       *row++ = pixel->green;
       *row++ = pixel->blue;
@@ -236,7 +264,7 @@ take_screenshot(char *path)
   png_set_rows(pngp, png_infop, row_pointers);
   png_write_png(pngp, png_infop, PNG_TRANSFORM_IDENTITY, NULL);
 
-  for(int y = 0; y < screenshot.height; y++)
+  for(int y = 0; y < screenshot->height; y++)
   {
     png_free(pngp, row_pointers[y]);
     row_pointers[y] = NULL;
@@ -244,9 +272,6 @@ take_screenshot(char *path)
   png_free(pngp, row_pointers);
   row_pointers = NULL;
 
-
-  image->f.destroy_image(image);
-  image = NULL;
 
  png:
   png_destroy_write_struct(&pngp, &png_infop);
@@ -257,11 +282,7 @@ take_screenshot(char *path)
   fp = NULL;
 
  bitmap:
-  free(screenshot.pixels);
-  screenshot.pixels = NULL;
-
- display:
-  XCloseDisplay(display);
-  display = NULL;
+  free((pixel_t*)screenshot->pixels);
+  free((bitmap_t*)screenshot);
   return status;
 };
