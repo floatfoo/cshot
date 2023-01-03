@@ -41,10 +41,10 @@ XHandleError(Display *display, XErrorEvent *e)
 };
 
 
-bitmap_t const *const
+const bitmap_t *
 x_get_bitmap(int* status)
 {
-  bitmap_t *screenshot = (bitmap_t*)malloc(2*sizeof(bitmap_t));
+  bitmap_t *screenshot = (bitmap_t*)malloc(sizeof(bitmap_t));
 
   /* Get display and root window */
   Display *display = XOpenDisplay(NULL);
@@ -119,7 +119,7 @@ take_screenshot(char *path)
 {
   int status = 0;
 
-  bitmap_t const *screenshot = x_get_bitmap(&status);
+  const bitmap_t *screenshot = x_get_bitmap(&status);
   if (!screenshot)
   {
     if (status == ERRDISPLAY)
@@ -162,7 +162,7 @@ take_screenshot(char *path)
     }
   }
 
-  char path_to_image[512];
+  char *path_to_image = calloc(512, sizeof(char));
   if (strcmp(path + init_path_len - 4, ".png") != 0)
   {
     /* add timestamp */
