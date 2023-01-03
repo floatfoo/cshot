@@ -17,8 +17,8 @@ $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	$(COMPILE.c) -o $@ $<
 
 install:
-	chmod +x $(TARGET)
-	cp $(TARGET) /usr/local/bin/
+	cp $(TARGET) $(DESTDIR)$(EXEC_PREFIX)/bin
+	chmod 755 $(DESTDIR)$(EXEC_PREFIX)$(TARGET)
 
 uninstall:
 	$(RM) /usr/local/bin/$(TARGET)
