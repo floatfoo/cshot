@@ -18,7 +18,7 @@ $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 
 install:
 	cp $(TARGET) $(DESTDIR)$(EXEC_PREFIX)/bin
-	chmod 755 $(DESTDIR)$(EXEC_PREFIX)$(TARGET)
+	chmod 755 $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 uninstall:
 	$(RM) /usr/local/bin/$(TARGET)
