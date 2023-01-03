@@ -23,7 +23,7 @@ typedef struct bitmap_t
 
 /* Get pixel from gixen bitmap at (x, y) */
 static pixel_t *
-pixel_at(bitmap_t *bitmap, int x, int y)
+pixel_at(const bitmap_t *const bitmap, int x, int y)
 {
   return bitmap->pixels + bitmap->width * y + x;
 };
@@ -41,10 +41,11 @@ XHandleError(Display *display, XErrorEvent *e)
 };
 
 
-int
-take_screenshot(char *path)
+/* get bitmap from x11 api */
+const bitmap_t *
+x_get_bitmap(int* status)
 {
-  int status = 0;
+  bitmap_t *screenshot = (bitmap_t*)malloc(sizeof(bitmap_t));
 
   /* Get display and root window */
   Display *display = XOpenDisplay(NULL);
@@ -57,8 +58,9 @@ take_screenshot(char *path)
    */
   if (!display)
   {
-    perror("Error opening display");
-    return ERRDISPLAY;
+    status = (int*)ERRDISPLAY;
+    screenshot = NULL;
+    goto display;
   }
 
   Window root = DefaultRootWindow(display);
@@ -78,40 +80,47 @@ take_screenshot(char *path)
   /* If there is error during getting an image */
   if (image == NULL)
   {
-    perror("Error getting screen image");
-    status = ERRIMG;
+    status = (int*)ERRIMG;
+    screenshot = NULL;
     goto display;
   }
 
   /* Creating bitmap for screenshot */
-  bitmap_t screenshot;
-  screenshot.height = gwa.height;
-  screenshot.width = gwa.width;
+  screenshot->height = gwa.height;
+  screenshot->width = gwa.width;
   /* bitmap allocating */
-  screenshot.pixels = calloc(screenshot.width * screenshot.height, sizeof(pixel_t));
+  screenshot->pixels = calloc(screenshot->width * screenshot->height,
+			      sizeof(pixel_t));
 
   /* fill the bitmap image */
-  for (int y = 0; y < screenshot.width; ++y)
+  for (size_t y = 0; y < screenshot->width; ++y)
   {
-    for (int x = 0; x < screenshot.height; ++x)
+    for (size_t x = 0; x < screenshot->height; ++x)
     {
       uint32_t pixel = image->f.get_pixel(image, y, x);
-      pixel_at(&screenshot, y, x)->green = (pixel & image->green_mask) >> 8;
-      pixel_at(&screenshot, y, x)->red = (pixel & image->red_mask) >> 16;
-      pixel_at(&screenshot, y, x)->blue = pixel & image->blue_mask;
+      pixel_at(screenshot, y, x)->green = (pixel & image->green_mask) >> 8;
+      pixel_at(screenshot, y, x)->red = (pixel & image->red_mask) >> 16;
+      pixel_at(screenshot, y, x)->blue = pixel & image->blue_mask;
     }
   }
 
-  /* Start creating png image */
-  FILE *fp = NULL;
-  png_structp pngp = NULL;
-  png_infop png_infop = NULL;
-  png_bytepp row_pointers = NULL;
 
-  int pixel_size = 3;
-  /* aka sample in spec */
-  int depth = 8;
+  image->f.destroy_image(image);
+  image = NULL;
 
+ display:
+  XCloseDisplay(display);
+  display = NULL;
+  return screenshot;
+};
+
+
+/* validate and create unix path
+ * for image file
+ */
+const char *
+create_unix_path(char *path, int* status)
+{
   /*
    * Path validation
    * if given path with out a backslash,
@@ -128,13 +137,12 @@ take_screenshot(char *path)
   {
     if (access(path, F_OK) == 0)
     {
-      fprintf(stderr, "File already exists!");
-      status = ERRFILECREATION;
-      goto bitmap;
+      status = (int*)ERRFILECREATION;
+      return NULL;
     }
   }
 
-  char path_to_image[512];
+  char *path_to_image = calloc(512, sizeof(char));
   if (strcmp(path + init_path_len - 4, ".png") != 0)
   {
     /* add timestamp */
@@ -146,9 +154,8 @@ take_screenshot(char *path)
 	     "%Y-%m-%d %H:%M:%S",
 	     localtime(&current_time)) == 0)
     {
-      perror("Error getting the timestamp");
-      status = ERRTIMESTAPS;
-      goto bitmap;
+      status = (int*)ERRTIMESTAPS;
+      return NULL;
     }
 
     if (strcmp(path, ".") == 0)
@@ -165,7 +172,46 @@ take_screenshot(char *path)
 	strcat(path_to_image, postfix);
       }
   }
+  return path_to_image;
+};
 
+
+int
+take_screenshot(char *path, const bitmap_t* (get_bitmap)(int*))
+{
+  int status = 0;
+
+  const bitmap_t *screenshot = get_bitmap(&status);
+  if (!screenshot)
+  {
+    if (status == ERRDISPLAY)
+      perror("Error opening display");
+    else if (status == ERRIMG)
+      perror("Error getting screen image");
+
+    goto bitmap;
+  }
+
+  /* Start creating png image */
+  FILE *fp = NULL;
+  png_structp pngp = NULL;
+  png_infop png_infop = NULL;
+  png_bytepp row_pointers = NULL;
+
+  int pixel_size = 3;
+  /* aka sample in spec */
+  int depth = 8;
+
+  const char * path_to_image = create_unix_path(path, &status);
+  if (!path_to_image)
+  {
+    if (status == ERRFILECREATION)
+      fprintf(stderr, "File already exists!");
+    else if (status == ERRTIMESTAPS)
+      perror("Error getting the timestamp");
+
+    goto path;
+  }
 
   /* file creation */
   fp = fopen(path_to_image, "wb");
@@ -206,7 +252,7 @@ take_screenshot(char *path)
   /* set IHDR png header */
   png_set_IHDR(pngp,
 	       png_infop,
-	       screenshot.width, screenshot.height,
+	       screenshot->width, screenshot->height,
 	       depth,
 	       PNG_COLOR_TYPE_RGB,
 	       PNG_INTERLACE_NONE,
@@ -217,14 +263,14 @@ take_screenshot(char *path)
    * each row contain bytes
    * describing pixel
    */
-  row_pointers = png_malloc(pngp, screenshot.height * sizeof(png_byte*));
-  for (int y = 0; y < gwa.height; ++y)
+  row_pointers = png_malloc(pngp, screenshot->height * sizeof(png_byte*));
+  for (size_t y = 0; y < screenshot->height; ++y)
   {
-    png_bytep row = png_malloc(pngp, sizeof(uint8_t) * screenshot.width * pixel_size);
+    png_bytep row = png_malloc(pngp, sizeof(uint8_t) * screenshot->width * pixel_size);
     row_pointers[y] = row;
-    for (int x = 0; x < screenshot.width; ++x)
+    for (size_t x = 0; x < screenshot->width; ++x)
     {
-      pixel_t *pixel = pixel_at(&screenshot, x, y);
+      pixel_t *pixel = pixel_at(screenshot, x, y);
       *row++ = pixel->red;
       *row++ = pixel->green;
       *row++ = pixel->blue;
@@ -236,7 +282,7 @@ take_screenshot(char *path)
   png_set_rows(pngp, png_infop, row_pointers);
   png_write_png(pngp, png_infop, PNG_TRANSFORM_IDENTITY, NULL);
 
-  for(int y = 0; y < screenshot.height; y++)
+  for(size_t y = 0; y < screenshot->height; y++)
   {
     png_free(pngp, row_pointers[y]);
     row_pointers[y] = NULL;
@@ -244,9 +290,6 @@ take_screenshot(char *path)
   png_free(pngp, row_pointers);
   row_pointers = NULL;
 
-
-  image->f.destroy_image(image);
-  image = NULL;
 
  png:
   png_destroy_write_struct(&pngp, &png_infop);
@@ -256,12 +299,11 @@ take_screenshot(char *path)
   fclose(fp);
   fp = NULL;
 
- bitmap:
-  free(screenshot.pixels);
-  screenshot.pixels = NULL;
+ path:
+  free((char*)path_to_image);
 
- display:
-  XCloseDisplay(display);
-  display = NULL;
+ bitmap:
+  free((pixel_t*)screenshot->pixels);
+  free((bitmap_t*)screenshot);
   return status;
 };

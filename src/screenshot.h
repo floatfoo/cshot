@@ -21,6 +21,11 @@
 #define ERRPNG 5
 #define ERRPNGINFO 6
 
-int take_screenshot(char *path);
+typedef struct bitmap_t bitmap_t;
+
+const bitmap_t *x_get_bitmap(int* status);
+const char     *create_unix_path(char *path, int* status);
+
+int take_screenshot(char *path, const bitmap_t* (get_bitmap)(int*));
 
 #endif

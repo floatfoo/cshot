@@ -7,7 +7,7 @@ OBJ_PATH = obj/
 SRC = $(wildcard $(SRC_PATH)*.c)
 OBJ = $(patsubst $(SRC_PATH)%.c, $(OBJ_PATH)%.o, $(SRC))
 
-CFLAGS = -Wall -Werror -v -pg -g -O3 -std=c99
+CFLAGS = -Wall -Werror -v -pg -g -O0 -std=c99
 LDFLAGS = -lX11 -lpng
 
 $(TARGET): $(OBJ)
@@ -17,8 +17,8 @@ $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	$(COMPILE.c) -o $@ $<
 
 install:
-	chmod +x $(TARGET)
-	cp $(TARGET) /usr/local/bin/
+	cp $(TARGET) $(DESTDIR)$(EXEC_PREFIX)/bin
+	chmod 755 $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 uninstall:
 	$(RM) /usr/local/bin/$(TARGET)

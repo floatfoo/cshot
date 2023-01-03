@@ -4,6 +4,7 @@
 - [ ] Optimize
 - [ ] Write Unit tests
 - [X] make install
+- [ ] Multi-monitor
 - [ ] release
 - [ ] UI
 - [ ] Shared memory implementation
