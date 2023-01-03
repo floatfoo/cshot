@@ -92,9 +92,9 @@ x_get_bitmap(int* status)
 			      sizeof(pixel_t));
 
   /* fill the bitmap image */
-  for (int y = 0; y < screenshot->width; ++y)
+  for (size_t y = 0; y < screenshot->width; ++y)
   {
-    for (int x = 0; x < screenshot->height; ++x)
+    for (size_t x = 0; x < screenshot->height; ++x)
     {
       uint32_t pixel = image->f.get_pixel(image, y, x);
       pixel_at(screenshot, y, x)->green = (pixel & image->green_mask) >> 8;
@@ -246,11 +246,11 @@ take_screenshot(char *path)
    * describing pixel
    */
   row_pointers = png_malloc(pngp, screenshot->height * sizeof(png_byte*));
-  for (int y = 0; y < screenshot->height; ++y)
+  for (size_t y = 0; y < screenshot->height; ++y)
   {
     png_bytep row = png_malloc(pngp, sizeof(uint8_t) * screenshot->width * pixel_size);
     row_pointers[y] = row;
-    for (int x = 0; x < screenshot->width; ++x)
+    for (size_t x = 0; x < screenshot->width; ++x)
     {
       pixel_t *pixel = pixel_at(screenshot, x, y);
       *row++ = pixel->red;
@@ -264,7 +264,7 @@ take_screenshot(char *path)
   png_set_rows(pngp, png_infop, row_pointers);
   png_write_png(pngp, png_infop, PNG_TRANSFORM_IDENTITY, NULL);
 
-  for(int y = 0; y < screenshot->height; y++)
+  for(size_t y = 0; y < screenshot->height; y++)
   {
     png_free(pngp, row_pointers[y]);
     row_pointers[y] = NULL;
