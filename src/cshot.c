@@ -1,31 +1,26 @@
-#include <stdio.h>
-#include <argp.h>
 #include "screenshot.h"
+#include <argp.h>
+#include <stdio.h>
 
 #define ARGPC 1
 
 const char *argp_program_version = "1.0";
 const char *argp_program_bug_address = "1.0";
-static char doc[] =
-  "cshot - simple x11 screenshot facility";
+static char doc[] = "cshot - simple x11 screenshot facility";
 
 static struct argp_option options[] = {
-  {"path", 'p', "path", 0, "Save screenshot to provided path"},
+    {"path", 'p', "path", 0, "Save screenshot to provided path"},
 };
 
-struct arguments
-{
+struct arguments {
   char *args[ARGPC];
   char *output_path;
 };
 
-static error_t
-parse_opt(int key, char *arg, struct argp_state *state)
-{
+static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   struct arguments *arguments = state->input;
 
-  switch (key)
-  {
+  switch (key) {
   case 'p':
     arguments->output_path = arg;
     break;
@@ -36,11 +31,9 @@ parse_opt(int key, char *arg, struct argp_state *state)
   return 0;
 };
 
-static struct argp argp = { options, parse_opt, 0, doc };
+static struct argp argp = {options, parse_opt, 0, doc};
 
-int
-main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   struct arguments arguments;
   arguments.output_path = ".";
 
