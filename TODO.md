@@ -1,5 +1,5 @@
 - [X] Refactor
-- [ ] Format code
+- [X] Format code
 - [ ] Newer C standart
 - [ ] Optimize
 - [ ] Write Unit tests
