@@ -21,7 +21,7 @@ install:
 	chmod 755 $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 uninstall:
-	$(RM) $(DESTDIR)$(EXEC_PREFIX)/bin/bin/$(TARGET)
+	$(RM) $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 clean:
 	$(RM) $(OBJ_PATH)*.o $(TARGET) *.png
