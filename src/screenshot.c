@@ -11,7 +11,6 @@
 #include <time.h>
 #include <unistd.h>
 
-
 /* X11 error handling */
 int XHandleError(Display *display, XErrorEvent *e) {
   int buf_len = 150;
