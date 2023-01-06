@@ -1,6 +1,7 @@
 #ifndef SCREENSHOT_H
 
 #define SCREENSHOT_H
+#include "bitmap.h"
 
 /* define some error codes */
 #define ERRDISPLAY 1
@@ -9,8 +10,6 @@
 #define ERRFILECREATION 4
 #define ERRPNG 5
 #define ERRPNGINFO 6
-
-typedef struct bitmap_t bitmap_t;
 
 bitmap_t *x_get_bitmap(int *status);
 char *create_unix_path(char *path, int *status);
