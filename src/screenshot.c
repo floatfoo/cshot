@@ -1,20 +1,15 @@
 #include "screenshot.h"
 
-typedef struct pixel_t {
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-} pixel_t;
-
-typedef struct bitmap_t {
-  pixel_t *pixels;
-  size_t width, height;
-} bitmap_t;
-
-/* Get pixel from gixen bitmap at (x, y) */
-static pixel_t *pixel_at(bitmap_t *bitmap, int x, int y) {
-  return bitmap->pixels + bitmap->width * y + x;
-};
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <errno.h>
+#include <png.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
 
 /* X11 error handling */
 int XHandleError(Display *display, XErrorEvent *e) {
@@ -39,7 +34,7 @@ bitmap_t *x_get_bitmap(int *status) {
    * even though display is not NULL
    */
   if (!display) {
-    status = (int *)ERRDISPLAY;
+    *status = ERRDISPLAY;
     screenshot = NULL;
     goto display;
   }
@@ -56,7 +51,7 @@ bitmap_t *x_get_bitmap(int *status) {
 
   /* If there is error during getting an image */
   if (image == NULL) {
-    status = (int *)ERRIMG;
+    *status = ERRIMG;
     screenshot = NULL;
     goto display;
   }
@@ -105,7 +100,7 @@ char *create_unix_path(char *path, int *status) {
   /* check if file already exist */
   if (strcmp(path, ".") != 0) {
     if (access(path, F_OK) == 0) {
-      status = (int *)ERRFILECREATION;
+      *status = ERRFILECREATION;
       return NULL;
     }
   }
@@ -118,7 +113,7 @@ char *create_unix_path(char *path, int *status) {
     char timestamp[64];
     if (strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S",
                  localtime(&current_time)) == 0) {
-      status = (int *)ERRTIMESTAPS;
+      *status = ERRTIMESTAPS;
       return NULL;
     }
 
