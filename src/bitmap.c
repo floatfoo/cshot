@@ -1,6 +1,6 @@
+#include "bitmap.h"
 #include <stdint.h>
 #include <stdio.h>
-#include "bitmap.h"
 
 typedef struct pixel_t {
   uint8_t red;
