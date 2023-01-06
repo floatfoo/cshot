@@ -1,20 +1,16 @@
 #include "screenshot.h"
 
-typedef struct pixel_t {
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-} pixel_t;
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <errno.h>
+#include <png.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
 
-typedef struct bitmap_t {
-  pixel_t *pixels;
-  size_t width, height;
-} bitmap_t;
-
-/* Get pixel from gixen bitmap at (x, y) */
-static pixel_t *pixel_at(bitmap_t *bitmap, int x, int y) {
-  return bitmap->pixels + bitmap->width * y + x;
-};
 
 /* X11 error handling */
 int XHandleError(Display *display, XErrorEvent *e) {
