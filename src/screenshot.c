@@ -34,7 +34,7 @@ bitmap_t *x_get_bitmap(int *status) {
    * even though display is not NULL
    */
   if (!display) {
-    status = (int *)ERRDISPLAY;
+    *status = ERRDISPLAY;
     screenshot = NULL;
     goto display;
   }
@@ -51,7 +51,7 @@ bitmap_t *x_get_bitmap(int *status) {
 
   /* If there is error during getting an image */
   if (image == NULL) {
-    status = (int *)ERRIMG;
+    *status = ERRIMG;
     screenshot = NULL;
     goto display;
   }
@@ -100,7 +100,7 @@ char *create_unix_path(char *path, int *status) {
   /* check if file already exist */
   if (strcmp(path, ".") != 0) {
     if (access(path, F_OK) == 0) {
-      status = (int *)ERRFILECREATION;
+      *status = ERRFILECREATION;
       return NULL;
     }
   }
@@ -113,7 +113,7 @@ char *create_unix_path(char *path, int *status) {
     char timestamp[64];
     if (strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S",
                  localtime(&current_time)) == 0) {
-      status = (int *)ERRTIMESTAPS;
+      *status = ERRTIMESTAPS;
       return NULL;
     }
 
