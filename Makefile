@@ -7,7 +7,7 @@ OBJ_PATH = obj/
 SRC = $(wildcard $(SRC_PATH)*.c)
 OBJ = $(patsubst $(SRC_PATH)%.c, $(OBJ_PATH)%.o, $(SRC))
 
-CFLAGS = -Wall -Werror -v -pg -g -O0 -std=c99
+CFLAGS = -Wall -Wextra -Werror -v -pg -g -O0 -std=c99
 LDFLAGS = -lX11 -lpng
 
 $(TARGET): $(OBJ)
