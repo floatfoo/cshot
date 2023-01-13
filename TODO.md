@@ -12,3 +12,4 @@
 - [ ] Extensive README
 - [ ] dwm integration
 - [ ] command line setting
+- [ ] make a lib
