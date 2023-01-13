@@ -9,7 +9,7 @@ const char *argp_program_bug_address = "1.0";
 static char doc[] = "cshot - simple x11 screenshot facility";
 
 static struct argp_option options[] = {
-    {"path", 'p', "path", 0, "Save screenshot to provided path"},
+    {"path", 'p', "path", 0, "Save screenshot to provided path", -1},
 };
 
 struct arguments {
@@ -31,7 +31,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   return 0;
 };
 
-static struct argp argp = {options, parse_opt, 0, doc};
+static struct argp argp = {options, parse_opt, 0, doc, NULL, NULL, NULL};
 
 int main(int argc, char **argv) {
   struct arguments arguments;

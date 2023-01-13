@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <unistd.h>
+#include "path.h"
 
 /* X11 error handling */
 int XHandleError(Display *display, XErrorEvent *e) {
@@ -82,55 +81,6 @@ display:
   return screenshot;
 };
 
-/* validate and create unix path
- * for image file
- */
-char *create_unix_path(char *path, int *status) {
-  /*
-   * Path validation
-   * if given path with out a backslash,
-   * append it (ignoring .png file itself)
-   *
-   */
-  int init_path_len = strlen(path);
-  if (strlen(path) != 1 && path[init_path_len - 1] != '/' &&
-      strcmp(path + init_path_len - 4, ".png") != 0)
-    strcat(path, "/");
-
-  /* check if file already exist */
-  if (strcmp(path, ".") != 0) {
-    if (access(path, F_OK) == 0) {
-      *status = ERRFILECREATION;
-      return NULL;
-    }
-  }
-
-  char *path_to_image = calloc(512, sizeof(char));
-  if (strcmp(path + init_path_len - 4, ".png") != 0) {
-    /* add timestamp */
-    time_t current_time = time(NULL);
-
-    char timestamp[64];
-    if (strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S",
-                 localtime(&current_time)) == 0) {
-      *status = ERRTIMESTAPS;
-      return NULL;
-    }
-
-    if (strcmp(path, ".") == 0) {
-      strcat(path_to_image, "screenshot-");
-      strcat(timestamp, ".png");
-      strcat(path_to_image, timestamp);
-    } else {
-      char *postfix = "screenshot-";
-      strcat(timestamp, ".png");
-      strcat(postfix, timestamp);
-      strcat(path_to_image, postfix);
-    }
-  }
-  return path_to_image;
-};
-
 int take_screenshot(char *path, bitmap_t *(get_bitmap)(int *)) {
   int status = 0;
 
@@ -154,7 +104,7 @@ int take_screenshot(char *path, bitmap_t *(get_bitmap)(int *)) {
   /* aka sample in spec */
   int depth = 8;
 
-  char *path_to_image = create_unix_path(path, &status);
+  char *path_to_image = create_path(path, &status);
   if (!path_to_image) {
     if (status == ERRFILECREATION)
       fprintf(stderr, "File already exists!");
