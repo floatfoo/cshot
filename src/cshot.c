@@ -35,7 +35,7 @@ static struct argp argp = {options, parse_opt, 0, doc, NULL, NULL, NULL};
 
 int main(int argc, char **argv) {
   struct arguments arguments;
-  arguments.output_path = ".";
+  arguments.output_path = "~";
 
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 

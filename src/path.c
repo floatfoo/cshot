@@ -18,7 +18,7 @@ char *create_path(char *path, int *status) {
     strcat(path, "/");
 
   /* check if file already exist */
-  if (strcmp(path, ".") != 0) {
+  if (strcmp(path, "~") != 0) {
     if (access(path, F_OK) == 0) {
       *status = ERRFILECREATION;
       return NULL;
@@ -30,7 +30,7 @@ char *create_path(char *path, int *status) {
     /* add timestamp */
     time_t current_time = time(NULL);
 
-    char timestamp[64];
+    char timestamp[256];
     if (strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S",
                  localtime(&current_time)) == 0) {
       *status = ERRTIMESTAPS;
@@ -41,8 +41,16 @@ char *create_path(char *path, int *status) {
       strcat(path_to_image, "screenshot-");
       strcat(timestamp, ".png");
       strcat(path_to_image, timestamp);
+    } else if (strcmp(path, "~") == 0) {
+	char *home = getenv("HOME");
+	char path[128];
+	strcat(path, home);
+	strcat(path, "/screenshot-");
+	strcat(path_to_image, path);
+	strcat(timestamp, ".png");
+	strcat(path_to_image, timestamp);
     } else {
-      char *postfix = "screenshot-";
+      char postfix[128] = "screenshot-";
       strcat(timestamp, ".png");
       strcat(postfix, timestamp);
       strcat(path_to_image, postfix);
