@@ -7,7 +7,7 @@ OBJ_PATH = obj/
 SRC = $(wildcard $(SRC_PATH)*.c)
 OBJ = $(patsubst $(SRC_PATH)%.c, $(OBJ_PATH)%.o, $(SRC))
 
-CFLAGS = -Wall -Wextra -Werror -fanalyzer -Wanalyzer-too-complex -v -pg -g -O0 -std=c99
+CFLAGS = -Wall -Wextra -v -O3 -std=c99
 LDFLAGS = -lX11 -lpng
 
 $(TARGET): $(OBJ)
@@ -21,7 +21,7 @@ install:
 	chmod 755 $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 uninstall:
-	$(RM) /usr/local/bin/$(TARGET)
+	$(RM) $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 clean:
 	$(RM) $(OBJ_PATH)*.o $(TARGET) *.png
