@@ -1,5 +1,7 @@
 #include "screenshot.h"
 
+#include "bitmap.h"
+#include "path.h"
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <errno.h>
@@ -8,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "path.h"
 
 /* X11 error handling */
 int XHandleError(Display *display, XErrorEvent *e) {
@@ -22,6 +23,12 @@ int XHandleError(Display *display, XErrorEvent *e) {
 /* get bitmap from x11 api */
 bitmap_t *x_get_bitmap(int *status) {
   bitmap_t *screenshot = (bitmap_t *)malloc(sizeof(bitmap_t));
+  if (!screenshot) {
+      *status = ERRMEMALLOC;
+      free(screenshot);
+      screenshot = NULL;
+      goto display;
+  }
 
   /* Get display and root window */
   Display *display = XOpenDisplay(NULL);
@@ -34,6 +41,7 @@ bitmap_t *x_get_bitmap(int *status) {
    */
   if (!display) {
     *status = ERRDISPLAY;
+    free(screenshot);
     screenshot = NULL;
     goto display;
   }
@@ -49,8 +57,9 @@ bitmap_t *x_get_bitmap(int *status) {
       XGetImage(display, root, 0, 0, gwa.width, gwa.height, AllPlanes, ZPixmap);
 
   /* If there is error during getting an image */
-  if (image == NULL) {
+  if (!image) {
     *status = ERRIMG;
+    free(screenshot);
     screenshot = NULL;
     goto display;
   }
@@ -110,6 +119,8 @@ int take_screenshot(char *path, bitmap_t *(get_bitmap)(int *)) {
       fprintf(stderr, "File already exists!");
     else if (status == ERRTIMESTAPS)
       perror("Error getting the timestamp");
+    else if (status == ERRMEMALLOC)
+      perror("Error getting the memory for the path");
 
     goto path;
   }
