@@ -116,7 +116,7 @@ int take_screenshot(char *path, bitmap_t *(get_bitmap)(int *)) {
   char *path_to_image = create_path(path, &status);
   if (!path_to_image) {
     if (status == ERRFILECREATION)
-      fprintf(stderr, "File already exists!");
+      fprintf(stderr, "File already exists!\n");
     else if (status == ERRTIMESTAPS)
       perror("Error getting the timestamp");
     else if (status == ERRMEMALLOC)
