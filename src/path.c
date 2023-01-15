@@ -25,7 +25,7 @@ char *create_path(char *path, int *status) {
     }
   }
 
-  char *path_to_image = malloc(512*sizeof(char));
+  char *path_to_image = calloc(512, sizeof(char));
   if (!path_to_image) {
       *status = ERRMEMALLOC;
       free(path_to_image);
