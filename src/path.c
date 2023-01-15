@@ -26,6 +26,12 @@ char *create_path(char *path, int *status) {
   }
 
   char *path_to_image = calloc(512, sizeof(char));
+  if (!path_to_image) {
+      *status = ERRMEMALLOC;
+      free(path_to_image);
+      return NULL;
+  }
+
   if (strcmp(path + init_path_len - 4, ".png") != 0) {
     /* add timestamp */
     time_t current_time = time(NULL);
