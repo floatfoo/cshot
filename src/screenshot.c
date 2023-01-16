@@ -24,10 +24,10 @@ int XHandleError(Display *display, XErrorEvent *e) {
 bitmap_t *x_get_bitmap(int *status) {
   bitmap_t *screenshot = (bitmap_t *)malloc(sizeof(bitmap_t));
   if (!screenshot) {
-      *status = ERRMEMALLOC;
-      free(screenshot);
-      screenshot = NULL;
-      goto display;
+    *status = ERRMEMALLOC;
+    free(screenshot);
+    screenshot = NULL;
+    goto display;
   }
 
   /* Get display and root window */
