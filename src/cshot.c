@@ -61,7 +61,11 @@ int main(int argc, char **argv) {
     } else if (delay == LLONG_MAX && errno == ERANGE) {
       perror("Delay argument error -- overflow");
       return 1;
+    } else if (*end != '\n') {
+	fprintf(stderr, "Delay argument error -- error parsing given argumnt");
+	return 1;
     }
+
     sleep(delay);
   }
 
