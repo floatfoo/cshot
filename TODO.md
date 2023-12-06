@@ -1,3 +1,12 @@
+# Release 0.2
+
+- [ ] Client-server refactoring. This step helps cshot to be integrated into the systemd.
+- [ ] Split development branches by develop and master. To maintain pipeline well.
+- [ ] Creating  build pipelines.
+
+
+# Other and misc
+
 - [X] Refactor
 - [X] Format code
 - [ ] Newer C standart
