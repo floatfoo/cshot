@@ -2,8 +2,7 @@
 .projectile
 
 ### Build files
-obj/
-cshot
+build/
 
 # ignore images
 *.png
