@@ -25,7 +25,12 @@ bitmap_t *x_get_bitmap(int *status) {
   }
 
   /* Get display and root window */
-  Display *display = XOpenDisplay(NULL);
+  Display *display = NULL;
+  display = XOpenDisplay(NULL);
+  if (NULL == display) {
+    goto open_error;
+  }
+
 
   /* set error handler */
   XSetErrorHandler(XHandleError);
@@ -80,6 +85,7 @@ bitmap_t *x_get_bitmap(int *status) {
 
 display:
   XCloseDisplay(display);
+open_error:
   display = NULL;
   return screenshot;
 };
