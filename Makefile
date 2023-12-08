@@ -30,7 +30,7 @@ LDFLAGS = -lX11 -lpng
 
 
 $(TARGET): $(OBJ)
-	$(LINK.c) $^ -o $(BUILD_PATH)$@
+	$(LINK.c) $(LDFLAGS) $^ -o $(BUILD_PATH)$@
 
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
 	$(COMPILE.c) $(LDFLAGS) -o $@ $<
