@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: pwd
       - run: mkdir --parents release/obj/
-      - run  mkdir --parents debug/obj/
+      - run:  mkdir --parents debug/obj/
       - run: ls -la
       - run: make -k
       - run: make install
