@@ -8,7 +8,7 @@ jobs:
       - run: pwd
       - run: mkdir --parents release/obj/
       - run:  mkdir --parents debug/obj/
-      - run: apt-get install libpng-dev xorg
+      - run: sudo apt-get install libpng-dev xorg
       - run: ls -la
       - run: make -k
       - run: make install
