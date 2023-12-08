@@ -1,0 +1,8 @@
+name: build
+on: [pull_request]
+jobs:
+  ubuntu-build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: make -k
+      - run: make install
