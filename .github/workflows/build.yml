@@ -6,6 +6,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: pwd
+      - run: mkdir --parent release/obj/
+      - run  mkdir --parent debug/obj/
       - run: ls -la
       - run: make -k
       - run: make install
