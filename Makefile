@@ -33,7 +33,7 @@ $(TARGET): $(OBJ)
 	$(LINK.c) $^ -o $(BUILD_PATH)$@
 
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
-	$(COMPILE.c) -o $@ $<
+	$(COMPILE.c) $(LDFLAGS) -o $@ $<
 
 install:
 	cp $(BUILD_PATH)$(TARGET) $(DESTDIR)$(EXEC_PREFIX)/bin/
