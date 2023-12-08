@@ -21,15 +21,11 @@ bitmap_t *x_get_bitmap(int *status) {
     *status = ERRMEMALLOC;
     free(screenshot);
     screenshot = NULL;
-    goto display;
+    return screenshot;
   }
 
   /* Get display and root window */
-  Display *display = NULL;
-  display = XOpenDisplay(NULL);
-  if (NULL == display) {
-    goto open_error;
-  }
+  Display *display = XOpenDisplay(NULL);
 
 
   /* set error handler */
@@ -85,7 +81,6 @@ bitmap_t *x_get_bitmap(int *status) {
 
 display:
   XCloseDisplay(display);
-open_error:
   display = NULL;
   return screenshot;
 };
@@ -93,3 +88,4 @@ open_error:
 bitmap_t *w_get_bitmap(int*){
   return NULL;
 }
+
