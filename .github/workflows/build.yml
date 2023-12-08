@@ -4,5 +4,6 @@ jobs:
   ubuntu-build:
     runs-on: ubuntu-latest
     steps:
+      - run: ls -la
       - run: make -k
       - run: make install
