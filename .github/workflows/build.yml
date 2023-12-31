@@ -7,8 +7,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: pwd
       - run: mkdir --parents release/obj/
-      - run:  mkdir --parents debug/obj/
-      - run: apt-get install libpng-dev libx11-dev
+      - run: mkdir --parents debug/obj/
+      - run: sudo apt-get install libpng-dev libx11-dev
       - run: ls -la
       - run: make -k
       - run: make install
