@@ -8,7 +8,7 @@ jobs:
       - run: pwd
       - run: mkdir --parents release/obj/
       - run: mkdir --parents debug/obj/
-      - run: sudo apt-get update && sudo apt-get install -y apt-transport-https
+      - run: sudo apt-get update && sudo apt-get install -y apt-transport-https build-essential
       - run: sudo apt-get install -y libpng-dev libx11-dev
       - run: ls -la
       - run: make
