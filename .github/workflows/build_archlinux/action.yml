@@ -1,0 +1,8 @@
+name: 'Build ArchLinux'
+on: [pull_request]
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  run: make -k
+
+
