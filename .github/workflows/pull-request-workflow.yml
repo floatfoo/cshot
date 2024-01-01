@@ -1,0 +1,13 @@
+name: 'Pull Request workflow'
+on: [pull_request]
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y apt-transport-https
+      - run: sudo apt-get install -y libx11-dev
+      - run: sudo apt-get install -y libpng-dev
+      - run: pwd
+      - run: ls -la
+      - run: make -k
