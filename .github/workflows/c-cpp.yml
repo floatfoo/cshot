@@ -1,15 +1,14 @@
 name: cshot pipes
 
-on: ["push", "pull_request"]
+on: ["pull_request"]
 
 jobs:
-  build:
-
+  build_release:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
+    - uses: awalsh128/cache-apt-pkgs-action@latest
     - name: build release
-      run: make -k
-    - name: build debug
-      run: make -k BUILD=DEBUG
+    - run: sudo apt-get install -y base-devel
+    - run: sudo apt-get install -y libx11-dev
+    - run: sudo apt-get install -y libpng-dev
+    - run: make -k
