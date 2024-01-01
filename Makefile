@@ -33,6 +33,7 @@ $(TARGET): $(OBJ)
 	$(LINK.c) $^ -o $(BUILD_PATH)$@
 
 $(OBJ_PATH)%.o: $(SRC_PATH)%.c
+	@mkdir -p $(@D)
 	$(COMPILE.c) -o $@ $<
 
 install:
