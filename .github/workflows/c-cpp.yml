@@ -6,7 +6,6 @@ jobs:
   build_release:
     runs-on: ubuntu-latest
     steps:
-    - uses: awalsh128/cache-apt-pkgs-action@latest
     - run: sudo apt-get install -y base-devel
     - run: sudo apt-get install -y libx11-dev
     - run: sudo apt-get install -y libpng-dev
