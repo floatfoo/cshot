@@ -1,0 +1,15 @@
+name: cshot pipes
+
+on: ["push", "pull_request"]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: build release
+      run: make -k
+    - name: build debug
+      run: make -k BUILD=DEBUG
