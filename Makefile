@@ -47,5 +47,8 @@ clean:
 	$(RM) release/obj/*.o release/$(TARGET) *.png
 	$(RM) debug/obj/*.o debug/$(TARGET) *.png
 
-.PHONY: install unintall clean
+format:
+	clang-format --sort-includes -i src/*.{h,c}
+
+.PHONY: install unintall clean format
 
