@@ -47,3 +47,5 @@ clean:
 	$(RM) release/obj/*.o release/$(TARGET) *.png
 	$(RM) debug/obj/*.o debug/$(TARGET) *.png
 
+.PHONY: install unintall clean
+
