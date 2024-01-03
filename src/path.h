@@ -5,6 +5,6 @@
 /* validate and create unix path
  * for image file
  */
-char *create_path(char *path, int* status);
+char *create_path (char *path, int *status);
 
 #endif
