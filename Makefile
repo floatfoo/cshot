@@ -24,7 +24,7 @@ OBJ = $(patsubst $(SRC_PATH)%.c, $(OBJ_PATH)%.o, $(SRC))
 ifeq ($(BUILD), $(DEBUG))
 CFLAGS = -Wall -Wextra -Werror -v -O3 -std=c11
 else
-CFLAGS = -Wall -Wextra -Werror -v -O1 -std=c11 -g -pg
+CFLAGS = -Wall -Wextra -Werror -v -O1 -std=c11 -g -pg -fprofile-arcs -ftest-coverage
 endif
 LDFLAGS = -lX11 -lpng
 
