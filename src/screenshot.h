@@ -12,6 +12,6 @@
 #define ERRPNGINFO 6
 #define ERRMEMALLOC 7
 
-int take_screenshot(char *path, bitmap_t *(get_bitmap)(int *));
+int take_screenshot (char *path, bitmap_t *(get_bitmap)(int *));
 
 #endif
