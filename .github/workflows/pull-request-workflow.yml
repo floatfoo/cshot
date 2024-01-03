@@ -1,0 +1,34 @@
+name: 'Pull Request workflow'
+on: [pull_request]
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      ports:
+        - 80
+    steps:
+      - uses: actions/checkout@v4
+      - run: pacman -Sy --noconfirm xorg-server
+      - run: pacman -Sy --noconfirm libpng
+      - run: pacman -Sy --noconfirm make
+      - run: pacman -Sy --noconfirm gcc
+      - run: pwd
+      - run: ls -la
+      - run: make -k
+      
+  build_debug:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      ports:
+        - 80
+    steps:
+      - uses: actions/checkout@v4
+      - run: pacman -Sy --noconfirm xorg-server
+      - run: pacman -Sy --noconfirm libpng
+      - run: pacman -Sy --noconfirm make
+      - run: pacman -Sy --noconfirm gcc
+      - run: pwd
+      - run: ls -la
+      - run: make -k BUILD=DEBUG
