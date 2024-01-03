@@ -44,8 +44,8 @@ uninstall:
 	$(RM) $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 clean:
-	$(RM) release/obj/*.o release/$(TARGET) *.png
-	$(RM) debug/obj/*.o debug/$(TARGET) *.png
+	$(RM) -r release/
+	$(RM) -r debug/
 
 format:
 	clang-format --sort-includes -i src/*.{h,c}
