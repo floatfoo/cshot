@@ -9,8 +9,8 @@ jobs:
         - 80
     steps:
       - uses: actions/checkout@v4
-      - run: pacman -S --no-confirm libx11-dev
-      - run: pacman -S --no-confirm libpng-dev
+      - run: pacman -S --noconfirm libx11-dev
+      - run: pacman -S --noconfirm libpng-dev
       - run: pwd
       - run: ls -la
       - run: make -k
