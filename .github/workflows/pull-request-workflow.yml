@@ -12,6 +12,7 @@ jobs:
       - run: pacman -Sy --noconfirm xorg-server
       - run: pacman -Sy --noconfirm libpng
       - run: pacman -Sy --noconfirm make
+      - run: pacman -Sy --noconfirm gcc
       - run: pwd
       - run: ls -la
       - run: make -k
@@ -27,6 +28,7 @@ jobs:
       - run: pacman -Sy --noconfirm xorg-server
       - run: pacman -Sy --noconfirm libpng
       - run: pacman -Sy --noconfirm make
+      - run: pacman -Sy --noconfirm gcc
       - run: pwd
       - run: ls -la
       - run: make -k BUILD=DEBUG
