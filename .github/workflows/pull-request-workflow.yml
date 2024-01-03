@@ -3,12 +3,15 @@ on: [pull_request]
 jobs:
   build_release:
     runs-on: ubuntu-latest
+    container:
+      image: archlinux
+      ports:
+        - 80
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update
-      - run: sudo apt-get install -y apt-transport-https
-      - run: sudo apt-get install -y libx11-dev
-      - run: sudo apt-get install -y libpng-dev
+      - run: sudo pacman -S --no-confirm apt-transport-https
+      - run: sudo pacman -S --no-confirm libx11-dev
+      - run: sudo pacman -S --no-confirm libpng-dev
       - run: pwd
       - run: ls -la
       - run: make -k
