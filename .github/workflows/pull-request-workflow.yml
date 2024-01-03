@@ -9,9 +9,8 @@ jobs:
         - 80
     steps:
       - uses: actions/checkout@v4
-      - run: sudo pacman -S --no-confirm apt-transport-https
-      - run: sudo pacman -S --no-confirm libx11-dev
-      - run: sudo pacman -S --no-confirm libpng-dev
+      - run: pacman -S --no-confirm libx11-dev
+      - run: pacman -S --no-confirm libpng-dev
       - run: pwd
       - run: ls -la
       - run: make -k
