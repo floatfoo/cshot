@@ -1,9 +1,30 @@
 #include "path.h"
 #include "screenshot.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
+
+
+char*
+path_maybe_append_baskslash(const char* path)
+{
+  return path_maybe_append_baskslash_n(path, strlen(path));
+}
+
+char*
+path_maybe_append_baskslash_n(const char* path, size_t n)
+{
+  char* new_path = calloc(n + 1, sizeof(char));
+  strcat(new_path, path);
+  if (n < 2 || path[n - 1] == '/' || path[n] == '\\') {
+    return new_path;
+  }
+  strcat(new_path, "/");
+  return new_path;
+}
 
 char*
 create_path(char* path, int* status)
