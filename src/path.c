@@ -29,17 +29,9 @@ path_maybe_append_baskslash_n(const char* path, size_t n)
 char*
 create_path(char* path, int* status)
 {
-  /*
-   * Path validation
-   * if given path with out a backslash,
-   * append it (ignoring .png file itself)
-   *
-   */
   int init_path_len = strlen(path);
-  if (strlen(path) != 1 && path[init_path_len - 1] != '/' &&
-      strcmp(path + init_path_len - 4, ".png") != 0)
-    strcat(path, "/");
-
+  path = path_maybe_append_baskslash(path);
+  
   /* check if file already exist */
   if (strcmp(path, "~") != 0) {
     if (access(path, F_OK) == 0) {
