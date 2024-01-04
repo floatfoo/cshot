@@ -1,5 +1,5 @@
-#include "display_server.h"
-#include "screenshot.h"
+#include "../src/display_server.h"
+#include "../src/screenshot.h"
 #include <argp.h>
 #include <stdio.h>
 #include <stdlib.h>
