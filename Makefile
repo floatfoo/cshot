@@ -29,10 +29,10 @@ OBJ = $(patsubst $(SRC_PATH)%.c, $(OBJ_PATH)%.o, $(SRC))
 OBJ_APP = $(patsubst $(APP_PATH)%.c, $(OBJ_APP_PATH)%.o, $(APP))
 OBJ_TEST = $(patsubst $(TEST_PATH)%.c, $(OBJ_TEST_PATH)%.o, $(TEST))
 
-ifeq ($(BUILD), $(DEBUG))
-CFLAG = -Wall -Wextra -Werror -O3 -std=c11 -v -fpie
+ifeq ($(BUILD), $(RELEASE))
+CFLAG = -Wall -Wextra -Werror -O3 -std=c11 -v
 else
-CFLAGS = -Wall -Wextra -Werror -O1 -std=c11 -v -fpie -g -pg -fprofile-arcs -ftest-coverage
+CFLAGS = -Wall -Wextra -Werror -Wpadded -std=c11 -v -g -pg -fprofile-arcs -ftest-coverage
 endif
 LDFLAGS = -lX11 -lpng
 
