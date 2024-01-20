@@ -5,7 +5,7 @@ RELEASE = release
 DEBUG = debug
 
 ifndef $(BUILD)
-BUILD = $(RELEASE)
+BUILD = $(DEBUG)
 endif
 
 SRC_PATH = src/
@@ -32,7 +32,7 @@ OBJ_TEST = $(patsubst $(TEST_PATH)%.c, $(OBJ_TEST_PATH)%.o, $(TEST))
 ifeq ($(BUILD), $(RELEASE))
 CFLAG = -Wall -Wextra -Werror -O3 -std=c11 -v
 else
-CFLAGS = -Wall -Wextra -Werror -Wpadded -std=c11 -v -g -pg -fprofile-arcs -ftest-coverage
+ CFLAGS = -Wall -Wextra -Werror -Wpadded -std=c11 -v -g -pg -fprofile-arcs -ftest-coverage
 endif
 LDFLAGS = -lX11 -lpng
 
@@ -58,11 +58,12 @@ uninstall:
 clean:
 	$(RM) -r release/
 	$(RM) -r debug/
+	$(RM) gmon.out
 
 format:
 	clang-format --sort-includes -i src/*.{h,c}
 
-all_test: $(OBJ) $(OBJ_TEST)
+test: $(OBJ) $(OBJ_TEST)
 	$(LINK.c) $(OBJ) $(OBJ_TEST) -o $(BUILD_PATH)$@
 
 $(OBJ_TEST_PATH)%.o: $(TEST_PATH)%.c

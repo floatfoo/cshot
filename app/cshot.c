@@ -15,6 +15,7 @@ static char doc[] = "cshot - simple x11 screenshot facility";
 static struct argp_option options[] = {
   { "path", 'p', "path", 0, "Save screenshot to provided path", -1 },
   { "delay", 'D', "sec", 0, "Delay before the actual screenshot (in sec)", -1 },
+  {0}
 };
 
 struct arguments
