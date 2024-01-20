@@ -12,7 +12,7 @@ Basic utils including:
 
 # How to build this util
 
-use one of the following build types: release(default, if build was not specified), debug.
+use one of the following build types: debug(default, if build was not specified), release.
 ```bash
 make -k BUILD=<build>
 ```
