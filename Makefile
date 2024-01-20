@@ -12,11 +12,17 @@ SRC_PATH = src/
 APP_PATH = app/
 TEST_PATH = test/
 
+BUILD_DIR = build
+
+BUILD_RELEASE_PATH = $(BUILD_DIR)/$(RELEASE)/
+BUILD_DEBUG_PATH = $(BUILD_DIR)/$(DEBUG)/
+
 ifeq ($(BUILD), $(RELEASE))
-BUILD_PATH = $(RELEASE)/
+BUILD_PATH = $(BUILD_RELEASE_PATH)
 else
-BUILD_PATH = $(DEBUG)/
+BUILD_PATH = $(BUILD_DEBUG_PATH)
 endif
+
 
 OBJ_PATH = $(BUILD_PATH)obj/
 OBJ_APP_PATH = $(OBJ_PATH)app/
@@ -49,15 +55,15 @@ $(OBJ_APP_PATH)%.o: $(APP_PATH)%.c
 	$(COMPILE.c) -o $@ $<
 
 install:
-	cp $(BUILD_PATH)$(TARGET) $(DESTDIR)$(EXEC_PREFIX)/bin/
+	cp $(BUILD_RELEASE_PATH)$(TARGET) $(DESTDIR)$(EXEC_PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 uninstall:
 	$(RM) $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 clean:
-	$(RM) -r release/
-	$(RM) -r debug/
+	$(RM) -r build/release/
+	$(RM) -r build/debug/
 	$(RM) gmon.out
 
 format:
