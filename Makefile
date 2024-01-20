@@ -13,9 +13,9 @@ APP_PATH = app/
 TEST_PATH = test/
 
 ifeq ($(BUILD), $(RELEASE))
-BUILD_PATH = $(RELEASE)/
+BUILD_PATH = build/$(RELEASE)/
 else
-BUILD_PATH = $(DEBUG)/
+BUILD_PATH = build/$(DEBUG)/
 endif
 
 OBJ_PATH = $(BUILD_PATH)obj/
@@ -56,8 +56,8 @@ uninstall:
 	$(RM) $(DESTDIR)$(EXEC_PREFIX)/bin/$(TARGET)
 
 clean:
-	$(RM) -r release/
-	$(RM) -r debug/
+	$(RM) -r build/release/
+	$(RM) -r build/debug/
 	$(RM) gmon.out
 
 format:
